@@ -66,32 +66,42 @@ int main() {
         
         data.close();
     } else if(answer == "no") {
-        cout << "enter username\n";
-        cin >> username;
-        cout << "enter password\n";
-        cin >> password;
+        bool found_user = false;
         
-        data.open("logins.txt", ios::in);
-        
-        bool founduser = false, password_correct = false;
-        while(!data.eof()) {
-            data >> line;
-            if(line == username) {
-                founduser = true;
+        while(!found_user) {
+            cout << "enter username\n";
+            cin >> username;
+            data.open("logins.txt", ios::in);
+            while(!data.eof()) {
                 data >> line;
-                if(line == password) {
-                    password_correct = true;
+                if(line == username) {
+                    found_user = true;
+                    break;
                 }
             }
+            if(!found_user) {
+                cout << "username does not exist, try again\n";
+                data.close();
+            }
         }
-        if(founduser == false) {
-            cout << "username does not exist\n";
-        } else if(founduser == true && password_correct == false) {
-            cout << "password incorrect\n";
-        } else {
-            cout << "Welcome back, " << username << "!\n";
+        bool password_correct = false;
+        int attempt = 0;
+        data>>line;
+        while(!password_correct && attempt < 5) {
+            cout << "enter password\n";
+            cin >> password;
+            if(line == password) {
+                cout << "Welcome back, " << username << "!\n";
+                password_correct = true;
+            } else if(attempt == 4) {
+                attempt++;
+                cout << "too many failed attempts, locked out... \n";
+            } else {
+                cout << "password incorrect, try again\n";
+                attempt++;
+            }
         }
-        
+        data.close();
     } else {
         cout << "invalid input\n";
     }
